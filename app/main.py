@@ -16,9 +16,12 @@ class Ship:
         row_start, row_end = min(r1, r2), max(r1, r2)
         column_start, column_end = min(c1, c2), max(c1, c2)
 
-        for row in range(row_start, row_end + 1):
-            for column in range(column_start, column_end + 1):
-                self.decks.append(Deck(row, column))
+        if r1 == r2:
+            for c in range(column_start, column_end + 1):
+                self.decks.append(Deck(r1, c))
+        elif c1 == c2:
+            for r in range(row_start, row_end + 1):
+                self.decks.append(Deck(r, c1))
 
     def fire(self, row: int, column: int) -> None:
         for deck in self.decks:
@@ -44,19 +47,19 @@ class Battleship:
     def fire(self, location: tuple) -> str | None:
         row, column = location
 
-        if self.field[row][column] == "~":
+        if self.field[row][column] in ("~", "*", "X"):
             return "Miss!"
 
-        elif self.field[row][column] == "□":
-            for ship in self.ships_objects:
-                if any(d.row == row
-                       and d.column == column for d in ship.decks):
-                    ship.fire(row, column)
+        for ship in self.ships_objects:
+            if any(d.row == row and d.column == column for d in ship.decks):
+                ship.fire(row, column)
 
-                    if ship.is_drowned:
-                        self.field[row][column] = "X"
-                        return "Sunk!"
-                    else:
-                        self.field[row][column] = "*"
-                        return "Hit!"
-        return None
+                if ship.is_drowned:
+                    for d in ship.decks:
+                        self.field[d.row][d.column] = "X"
+                    return "Sunk!"
+
+                self.field[row][column] = "*"
+                return "Hit!"
+
+        return "Miss!"
