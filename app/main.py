@@ -17,11 +17,11 @@ class Ship:
         column_start, column_end = min(c1, c2), max(c1, c2)
 
         if r1 == r2:
-            for c in range(column_start, column_end + 1):
-                self.decks.append(Deck(r1, c))
+            for column in range(column_start, column_end + 1):
+                self.decks.append(Deck(r1, column))
         elif c1 == c2:
-            for r in range(row_start, row_end + 1):
-                self.decks.append(Deck(r, c1))
+            for row in range(row_start, row_end + 1):
+                self.decks.append(Deck(row, c1))
 
     def fire(self, row: int, column: int) -> None:
         for deck in self.decks:
@@ -55,8 +55,8 @@ class Battleship:
                 ship.fire(row, column)
 
                 if ship.is_drowned:
-                    for d in ship.decks:
-                        self.field[d.row][d.column] = "X"
+                    for deck in ship.decks:
+                        self.field[deck.row][deck.column] = "X"
                     return "Sunk!"
 
                 self.field[row][column] = "*"
