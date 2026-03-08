@@ -44,7 +44,7 @@ class Battleship:
             for deck in new_ship.decks:
                 self.field[deck.row][deck.column] = "□"
 
-    def fire(self, location: tuple) -> str | None:
+    def fire(self, location: tuple) -> str:
         row, column = location
 
         if self.field[row][column] in ("~", "*", "X"):
@@ -63,3 +63,31 @@ class Battleship:
                 return "Hit!"
 
         return "Miss!"
+
+    def _validate_field(self) -> None:
+        lengths = sorted([len(s.decks) for s in self.ships_objects])
+        if lengths != [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]:
+            raise ValueError("Invalid fleet composition")
+
+        all_occupied = set()
+        for ship in self.ships_objects:
+            for deck in ship.decks:
+                all_occupied.add((deck.row, deck.column))
+
+        for ship in self.ships_objects:
+            for deck in ship.decks:
+                for dr in range(-1, 2):
+                    for dc in range(-1, 2):
+                        if dr == 0 and dc == 0:
+                            continue
+                        neighbor = (deck.row + dr, deck.column + dc)
+
+                        if neighbor in all_occupied:
+                            if not any(nd.row == neighbor[0]
+                                       and nd.column == neighbor[1]
+                                       for nd in ship.decks):
+                                raise ValueError("Ships are too close")
+
+    def print_field(self) -> None:
+        for row in self.field:
+            print(" ".join(row))
